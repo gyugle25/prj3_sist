@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.sist.prj3.Mapper"><!--여러 매퍼에 같은 아이디를 만들 수 있음-->
+
+<!--댓글등록  -->
+<insert id="insertComment" parameterType="comm">
+insert into comments (com_num, input_date, content, rv_num, user_id) 
+values (seq_comment.nextval, to_char(sysdate, 'yy-mm-dd hh24:mi'), 
+ #{content}, #{rv_num}, #{user_id})
+</insert>
+
+<!--대댓글 등록 -->
+<insert id="insertReply" parameterType="reply">
+insert into reply (RP_NUM, INPUT_DATE, CONTENT, COM_NUM, USER_ID)
+values (seq_reply.nextval, to_char(sysdate, 'yy-mm-dd hh24:mi'), 
+#{content} , #{com_num}, #{user_id})
+</insert>
+
+<!--댓글 리스트  -->
+<select id="selectComm" parameterType="Integer" resultType="kr.co.sist.prj3.user.comment.domain.CommentDomain">
+select 		rv_num, com_num, c.user_id, nick_name, profile, content, input_date
+from		comments c, user_table u
+where		c.user_id = u.user_id and rv_num= #{rv_num}
+order by com_num
+</select>
+
+<!--대댓글 리스트  -->
+<select id="selectReply" parameterType="Integer" resultType="kr.co.sist.prj3.user.comment.domain.ReplyDomain">
+select rp.com_num, rp_num, rp.user_id, u.profile, u.nick_name, rp.content, rp.input_date
+from   comments c, reply rp, user_table u
+where  c.com_num = rp.com_num and rp.user_id = u.user_id  and rv_num =  #{rv_num}
+order by rp_num
+</select>
+
+ 
+<!--댓글 삭제 -->
+<delete id="deleteComm" parameterType="Integer">
+delete 	from	comments
+where	com_num = #{com_num}
+</delete>
+
+
+<!-- 댓글 업데이트  -->
+<update id="updateDelComm" parameterType="Integer">
+update 	 comments
+set		 CONTENT = null
+where	 com_num = #{com_num}
+</update>
+
+
+<!-- 대댓글 삭제/업데이트  -->
+<update id="updateDelReply" parameterType="Integer">
+update 	 reply
+set		 CONTENT = null
+where	 rp_num = #{rp_num}
+</update>
+
+</mapper>
