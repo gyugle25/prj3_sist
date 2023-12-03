@@ -103,19 +103,33 @@ $(function(){
 	
 	
 		//닉네임 중복버튼
-		$("#dupBtn").click(function() {
+		
+	$("#dupBtn").click(function() {
 
 			var nickname = ($("#nick_name").val()).trim();
 
 			if (nickname != "") { //닉네임이 입력된 상태라면
 
 				//기존의 닉네임과 일치할 때 (변경x)
+
 				if (($("#old_nick_name").val()).trim() == nickname) {
 					//중복 확인된 닉네임에 기존 닉네임 저장
 					checkedNick = nickname;
 					return;
 				}//end if	
 
+				
+				//정규식 패턴
+				var regex = /^[a-zA-Z0-9_\uac00-\ud7af]{1,10}$/;
+				if (!regex.test(nickname)) {
+					alert("닉네임은 1~10자의 한글, 영문, 숫자, 밑줄(_)만 사용 가능합니다.");
+					$("#nick_name").val("");
+					$("#nick_name").focus() ; 
+					return;
+				}//end if 
+
+				
+				//중복 검사
 				$.ajax({
 
 					url : "nick_dup.do",
@@ -128,7 +142,7 @@ $(function(){
 
 						if (response.available) {
 							alert("사용 가능합니다.");
-							
+
 							//중복확인된 닉네임에 저장
 							checkedNick = $("#nick_name").val();
 
@@ -152,10 +166,7 @@ $(function(){
 			}//end else
 		});//click
 
-		
-		
-		
-	//프로필 등록 버튼
+		//프로필 등록 버튼
 		$("#setProfileBtn").click(function() {
 
 			var profile_msg = ($("#profile_msg").val()).trim();
@@ -172,22 +183,19 @@ $(function(){
 				return;
 			}//end if
 
-			
 			//닉네임 변경된 경우
-			if (oldnick != nickname) { 
+			if (oldnick != nickname) {
 				//중복 확인했는지 먼저 확인
 				if (checkedNick != nickname) { //중복확인된 닉네임과 최종 입력값 비교
 					alert("닉네임 중복 확인을 먼저 수행해주세요");
 					return;
 				}//end if
 			}//end if
-			
 
 			$("#frm").submit();
 
 		});//click
 
-		
 		//영화 검색	
 		$("#searchBtn").click(function() {
 
