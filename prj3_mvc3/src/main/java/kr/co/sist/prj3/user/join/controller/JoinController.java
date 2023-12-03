@@ -18,7 +18,7 @@ import kr.co.sist.prj3.user.join.vo.UserVO;
 public class JoinController {
 
 	@Autowired(required=false)
-	private JoinService jService;
+	private JoinService jService; //의존성 주입 > 코드의 결합도 낮춤
 	
 	/**
 	 * 회원가입 폼
@@ -69,7 +69,7 @@ public class JoinController {
 			
 			jsonObj =jService.idDupService(user_id);
 			
-			return jsonObj;
+			return jsonObj; //JSON 형식의 데이터 반환
 		
 	}//idDupProcess
 
@@ -98,6 +98,14 @@ public class JoinController {
 	
 	
 	
+	/**
+	 * 이메일 중복확인
+	 * @param email
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws UnsupportedEncodingException
+	 * @throws GeneralSecurityException
+	 */
 	@PostMapping("/emailDup.do")
 	@ResponseBody
 	public String emailDupProcess( String email) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException { //id_dup.jsp or void

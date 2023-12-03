@@ -14,19 +14,21 @@ public class JoinDAO {
 	public int insertUser( UserVO uVO) {
 		int cnt = 0;
 		
-		//1.MyBatis 핸들러 얻기
-		SqlSession ss =MyBatisHandler.getInstance().getMyBatisHandler(false);
-		
-		//2. Handler를 사용하기
-		cnt = ss.insert("insertJoin", uVO);		
-		
-		//3. transaction 완료하기
-				if(cnt==1) {
-					ss.commit();
-				}
-				
-		//4. 연결 끊기
-				if(ss!=null) {ss.close();}//end if
+		// 1.MyBatis 핸들러 얻기
+		SqlSession ss = MyBatisHandler.getInstance().getMyBatisHandler(false);
+
+		// 2. Handler를 사용하기
+		cnt = ss.insert("insertJoin", uVO);
+
+		// 3. transaction 완료하기
+		if (cnt == 1) {
+			ss.commit();
+		}
+
+		// 4. 연결 끊기
+		if (ss != null) {
+			ss.close();
+		} // end if
 				
 		return cnt;
 	}//insertUser

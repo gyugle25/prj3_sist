@@ -5,6 +5,7 @@
 <mapper namespace="kr.co.sist.prj3.Mapper"><!--여러 매퍼에 같은 아이디를 만들 수 있음-->
 
 
+<!--프로필 관리 화면에 보여줄 값들-->
 <select id="selectProfile" resultType="kr.co.sist.prj3.user.profile.domain.MyProfileDomain" parameterType="String">
 select user_id, nick_name, name, profile, profile_msg 
 from	user_table 
@@ -14,13 +15,14 @@ where	user_id = #{user_id}
 <update id="updateProfile" parameterType="kr.co.sist.prj3.user.profile.vo.ProfileModifyVO">
 update  user_table 
 set		nick_name = #{nick_name}, 
- <if test="profile != ''">
+ <if test="profile != ''"> <!--이미지를 업로드한 경우에만 동적으로 생성-->
         profile = #{profile},
 </if> 
 profile_msg = #{profile_msg} 
 where	user_id = #{user_id} 
 </update>
 
+<!--세션 갱신 위해 필요한 값들 (+birth_date)-->
 <select id="reselectUserInfo" parameterType="String" resultType="kr.co.sist.prj3.user.login.domain.LoginResultDomain">
 select 		user_id, nick_name, birth_date, profile, name
 from		user_table 

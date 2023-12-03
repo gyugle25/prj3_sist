@@ -18,24 +18,22 @@ public class JoinService {
 
 	
 	@Autowired
-	private JoinDAO jDAO;
+	private JoinDAO jDAO; 
 	
 	
 	//회원 가입
 	public boolean joinService ( UserVO uVO ) throws UnsupportedEncodingException, GeneralSecurityException {
 		int cnt=0;
 
-		// 비밀번호 SHA형식의 단방향 암호화 수행
-		uVO.setPass(DataEncrypt.messageDigest("MD5", uVO.getPass())); // set을 했으니 get으로 일반 비번을 받고 일방향 암호화를 한 후 다시 set한다.
+		// 비밀번호는 SHA형식의 단방향 암호화 수행 (MD5 알고리즘 사용)
+		uVO.setPass(DataEncrypt.messageDigest("MD5", uVO.getPass()));
 		
-		
-		//그외의 정보 복호화 가능한 양방향 암호화 수행
-		DataEncrypt de=new DataEncrypt("FsRt4SfY4US0IWtK4JPJsw==");//내가 사용한 키 나중에 보내줌. 
+		//그외의 정보는 복호화 가능한 양방향 암호화 수행 (AES 대칭키 알고리즘)
+		DataEncrypt de=new DataEncrypt("FsRt4SfY4US0IWtK4JPJsw==");
 		uVO.setName(de.encryption(uVO.getName()));
 		uVO.setEmail(de.encryption(uVO.getEmail()));
 		uVO.setTel(de.encryption(uVO.getTel()));
 		uVO.setAddr(de.encryption(uVO.getAddr())); 
-
 		
 		cnt = jDAO.insertUser(uVO);
 		return cnt==1;
@@ -52,6 +50,7 @@ public class JoinService {
 		jsonObj.put("available", available);
 		
 		
+		//입력 아이디로 조회 시 값이 없으면 true (중복x, 사용 가능)
 		available = jDAO.selectDupId(user_id)==null;
 		
 		

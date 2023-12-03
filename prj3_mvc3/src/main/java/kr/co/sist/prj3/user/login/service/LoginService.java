@@ -23,20 +23,17 @@ public class LoginService {
 	private LoginDAO lDAO;
 	
 	
-	// 로그인
+	// 로그인 (암호화하여 조회)
 		public LoginResultDomain loginService(LoginVO lVO) throws UnsupportedEncodingException, GeneralSecurityException {
 			
 			LoginResultDomain lrDomain = null;
 			
-			
 			lVO.setPass(DataEncrypt.messageDigest("MD5", lVO.getPass()));
 			lrDomain = lDAO.selectUser(lVO);
 
-			if(lrDomain!=null) {
-			
-			DataDecrypt dd=new DataDecrypt("FsRt4SfY4US0IWtK4JPJsw==");
-			lrDomain.setName(dd.decryption(lrDomain.getName()));
-			
+			if (lrDomain != null) {
+				DataDecrypt dd = new DataDecrypt("FsRt4SfY4US0IWtK4JPJsw==");
+				lrDomain.setName(dd.decryption(lrDomain.getName()));
 			}
 			
 			return lrDomain;

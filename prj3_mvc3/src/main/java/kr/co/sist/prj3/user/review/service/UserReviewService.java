@@ -111,10 +111,40 @@ public class UserReviewService {
 		
 		return reviewInfo;
 	}//showReview
+
+	
+	/**
+	 * 해당 리뷰 창에서 조회수 +1 증가
+	 * @param rvNum(리뷰번호)
+	 */
+	public boolean hitsUp(int rv_num) {
+		
+		boolean success=false;
+		success = urDAO.updateHits(rv_num)==1;
+		return success;
+		
+	}//hitsUp
+
 	
 	/**
 	 * 유저
-	 * 제목 클릭한 리뷰 좋아요 눌렀는지 보여주기
+	 * 리뷰 좋아요 누른 user들 보여주기
+	 * 2023.05.22
+	 * @author KT
+	 */
+	public List<ReviewLikeUserDomain> showLikeUser(int rv_num){
+		List<ReviewLikeUserDomain> list = new ArrayList<ReviewLikeUserDomain>();
+		
+		list = urDAO.selectLikeUser(rv_num);
+		
+		return list;
+	}//showLikeUser
+	
+	
+/////////////////////////////////////////////////규미/////////////////////////////////////////////////////////	
+	/**
+	 * 유저
+	 * 리뷰에 좋아요 상태
 	 * 2023.05.22
 	 * @author KM
 	 */
@@ -128,10 +158,10 @@ public class UserReviewService {
 		if(result != null && !result.isEmpty()) { //좋아요 레코드가 조회된다면
 			likeStatus = true;
 		}//end if
-		
 				
 		return likeStatus;
 	}//likeStatusService
+	
 	
 	/**
 	 * 유저
@@ -196,6 +226,7 @@ public class UserReviewService {
 		return cnt;
 	}//likeCount
 	
+	
 	/**
 	 * 유저
 	 * (마이페이지) 내가 쓴 리뷰 검색
@@ -210,31 +241,5 @@ public class UserReviewService {
 		return list;
 	}//MyReviewService
 
-	/**
-	 * 유저
-	 * 리뷰 좋아요 누른 user들 보여주기
-	 * 2023.05.22
-	 * @author KT
-	 */
-	public List<ReviewLikeUserDomain> showLikeUser(int rv_num){
-		List<ReviewLikeUserDomain> list = new ArrayList<ReviewLikeUserDomain>();
-		
-		list = urDAO.selectLikeUser(rv_num);
-		
-		return list;
-	}//showLikeUser
-	
-	///////////////////////////////////////////////////////////////////
-	
-	/**
-	 * 해당 리뷰 창에서 조회수 +1 증가
-	 * @param rvNum(리뷰번호)
-	 */
-	public boolean hitsUp(int rv_num) {
-		
-		boolean success=false;
-		success = urDAO.updateHits(rv_num)==1;
-		return success;
-		
-	}//hitsUp
+
 }//LikeService
