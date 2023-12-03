@@ -44,7 +44,6 @@ public class UserReviewController {
 	private CommentService commService ;
 	
 	/**
-	 * 유저   됐냐
 	 * 해당 영화에 대한 리뷰 리스트 보여주기 + 검색기능
 	 * 2023.05.20
 	 * @author KT
@@ -59,6 +58,44 @@ public class UserReviewController {
 		
 		return url;
 	}//showMovieInfo
+
+	
+
+	/**
+	 * 리뷰 정보 보여주기
+	 * @param rsVO
+	 * @param model
+	 */
+	@ResponseBody
+	@GetMapping("/review_info.do")
+	public String reviewInfo(ReviewSearchVO rsVO, Model model) throws PersistenceException, SQLException {
+
+		JSONObject jsonObj = new JSONObject();
+
+		//조회한 리뷰리스트
+		List<ReviewBoardDomain> reviewList = urService.showSearchReviewList(rsVO);
+		JSONArray reviewArray = new JSONArray();
+
+		jsonObj.put("reviewSize", reviewList.size());
+
+		for (ReviewBoardDomain review : reviewList) {
+			JSONObject reviewObj = new JSONObject();
+			reviewObj.put("title", review.getTitle());
+			reviewObj.put("nick_name", review.getNick_name());
+			reviewObj.put("input_date", review.getInput_date());
+			reviewObj.put("user_id", review.getUser_id());
+			reviewObj.put("hits", review.getHits());
+			reviewObj.put("like_total", review.getLike_total());
+			reviewObj.put("rv_num", review.getRv_num());
+			reviewArray.add(reviewObj);
+		} // end for
+
+		jsonObj.put("review", reviewArray);
+
+		return jsonObj.toJSONString();
+
+	}// review_info	
+	
 	
 	/**
 	 * 유저
@@ -149,6 +186,12 @@ public class UserReviewController {
 		
 		return "redirect:/review_post.do?m_num="+rmVO.getM_num()+"&m_title="+encodedMTitle+"&rv_num="+rv_num;
 	}//reviewFrm
+	
+	
+	// 해당 리뷰 창에서 조회수 +1씩 증가
+	public String hitsUpProcess(int rvNum) {
+	return "";
+	}
 /////////////////////////////////////////////////////테스트//////////////////////////////////////////////	
 	
 	/**
@@ -176,57 +219,43 @@ public class UserReviewController {
 	public String showReview(LikeVO lVO, Model model, @SessionAttribute(value="lrDomain", required = false) LoginResultDomain lrDomain) {
 		String user_id = "";
 		
-		
-		model.getAttribute("lrDomain");
-		
-		
-		try {
-			user_id = lrDomain.getUser_id();
-		} catch (NullPointerException e) {
-			// lrDomain이 null인 경우 예외 처리
-			user_id = " ";
-		}
-		
-		urService.hitsUp(lVO.getRv_num());
-		
-		 //리뷰정보
-		 model.addAttribute("reviewInfo",urService.showReview(lVO));
-		 
-		 //좋아요 누른 사람
-		 model.addAttribute("likeUser",urService.showLikeUser(lVO.getRv_num()));
-
-		 
-		 
-		//댓글
-		List<CommentDomain> combinedList = commService.getCommentsService(lVO.getRv_num());
-			
-		 
+		lrDomain = (LoginResultDomain)model.getAttribute("lrDomain");
+		user_id = lrDomain.getUser_id();
 		lVO.setUser_id(user_id);
+
+		// 조회 수
+		urService.hitsUp(lVO.getRv_num());
+
+		// 리뷰 정보 
+		model.addAttribute("reviewInfo", urService.showReview(lVO));
+
+		// 추천인 리스트
+		model.addAttribute("likeUser", urService.showLikeUser(lVO.getRv_num()));
 		 
-		 
-		//////////////// 규미 ////////////////
+   	    
+//////////////////////////////// 규미 ///////////////////////////////////////////////////////////////////////////////
+		
 		boolean likeStatus=false;
 		int likeCnt=0;
 		
-		
-		
-		//좋아요 상태와 수
+		//좋아요 상태와 개수
 		likeStatus = urService.likeStatusService(lVO);
 		likeCnt = urService.likeCount(lVO.getRv_num());
 		
+		//댓글,대댓글 리스트
+		List<CommentDomain> combinedList = commService.getCommentsService(lVO.getRv_num());
+
 		//모델에 담기
 		model.addAttribute("likeStatus", likeStatus);
 		model.addAttribute("likeCnt", likeCnt);
 		model.addAttribute("comments", combinedList);
-
-		model.addAttribute("id", lVO.getUser_id());
+		model.addAttribute("id", user_id);
+		
 		return "/review/review_post";
 	}//end showReview
 
 	
-	
-	
-	
+
 	/**
 	 * 유저
 	 * 해당 리뷰 창에서 좋아요 누르면 +1, 해제하면 -1
@@ -249,9 +278,7 @@ public class UserReviewController {
 			
 		} // end else
 		
-		
 		return jsonObj;
-		
 	}//likeUpDown
 
 	
@@ -260,23 +287,26 @@ public class UserReviewController {
 	 * 추천인 리스트 업데이트
 	 * @param lVO
 	 * @return
+	 * @author KM
 	 */
 	@ResponseBody
 	@GetMapping("/updateRecommendations.do")
 	public String updateRecommendationsList ( LikeVO lVO ) {
-		System.out.println(lVO.getRv_num());
+		
 		JSONArray jsonArray = new JSONArray();
+		JSONObject jsonObjectTemp = null;
+		
+		//좋아요 한 유저 리스트
 		List<ReviewLikeUserDomain> list = urService.showLikeUser(lVO.getRv_num());
 		
 	    for (ReviewLikeUserDomain likeUser : list ) {
-	        JSONObject jsonObject = new JSONObject();
-	        jsonObject.put("profile", likeUser.getProfile());
-	        jsonObject.put("nick_name", likeUser.getNick_name());
-	        jsonArray.add(jsonObject);
+	    	jsonObjectTemp = new JSONObject();
+	    	jsonObjectTemp.put("profile", likeUser.getProfile());
+	    	jsonObjectTemp.put("nick_name", likeUser.getNick_name());
+	        jsonArray.add(jsonObjectTemp);
 	    }//end for
 	    
 	    return jsonArray.toString();
-		
 	}//updateRecommendationsList
 	
 	
@@ -288,65 +318,22 @@ public class UserReviewController {
    @RequestMapping(value="/my_review.do",method= {RequestMethod.POST, RequestMethod.GET})
    public String reviewSearchProcess( MyReviewSearchVO mrsVO, Model model){
       
-      if(mrsVO.getSearch()==null && mrsVO.getSearch_type()==0) { //검색어와 옵션이 null일때
-         mrsVO.setSearch("");
+      if(mrsVO.getSearch()==null && mrsVO.getSearch_type()==0) {
+         mrsVO.setSearch(""); //null 처리
       }//end if
-       
-      
-      //VO에 아이디 세팅해야함
+             
+      String user_id="";
       LoginResultDomain lrDomain = (LoginResultDomain)model.getAttribute("lrDomain");
-      mrsVO.setUser_id(lrDomain.getUser_id());
+
+	  user_id = lrDomain.getUser_id();
+      mrsVO.setUser_id(user_id);
       
       List<MyReviewDomain> list = urService.myReviewService(mrsVO);
-      
       
       model.addAttribute("myReviews", list) ;
       model.addAttribute("myReviewCnt", list.size()) ;
       
-      
-      // 유저에 대한 정보도 넘겨줘야함 - LoginResultDomain이 세션에 저장될 것
-      
       return "/review/my_review";
-	   }// my_review_borad.jsp
-	
-///////////////////////////////////////////////////////////////////
-	
-	
-		// 해당 리뷰 창에서 조회수 +1씩 증가
-		public String hitsUpProcess(int rvNum) {
-			return "";
-		}
-	
-//////////////////////////////////////주요정보(화면전환)//////////////////////////
-		@ResponseBody
-		@GetMapping("/review_info.do")
-		public String reviewInfo(ReviewSearchVO rsVO, Model model) throws PersistenceException, SQLException {
-
-			JSONObject jsonObj = new JSONObject();
-
-				// 리뷰 리스트
-			List<ReviewBoardDomain> reviewList = urService.showSearchReviewList(rsVO);
-			JSONArray reviewArray = new JSONArray();
-
-			jsonObj.put("reviewSize", reviewList.size());
-
-			for (ReviewBoardDomain review : reviewList) {
-				JSONObject reviewObj = new JSONObject();
-				reviewObj.put("title", review.getTitle());
-				reviewObj.put("nick_name", review.getNick_name());
-				reviewObj.put("input_date", review.getInput_date());
-				reviewObj.put("user_id", review.getUser_id());
-				reviewObj.put("hits", review.getHits());
-				reviewObj.put("like_total", review.getLike_total());
-				reviewObj.put("rv_num", review.getRv_num());
-				reviewArray.add(reviewObj);
-			} // end for
-
-			jsonObj.put("review", reviewArray);
-
-			return jsonObj.toJSONString();
-
-		}// review_info
-		
+	   }		
 		
 }//class

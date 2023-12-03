@@ -56,7 +56,7 @@ public class ProfileController {
 	@RequestMapping(value="/my_profile.do", method= {RequestMethod.POST, RequestMethod.GET})
 	public String profileFrm( Model model ) throws UnsupportedEncodingException, NoSuchAlgorithmException, GeneralSecurityException {
 		
-		//로그인 했는지 확인 후 세션에서 꺼내기
+		//세션에서 id 꺼내기
 		LoginResultDomain lrDomain=(LoginResultDomain)model.getAttribute("lrDomain");
 		String user_id=lrDomain.getUser_id();
 		
@@ -85,7 +85,6 @@ public class ProfileController {
 	}//nickDupProcess
 	
 	
-	
 	 
 	/**
 	 * 프로필 수정(update)
@@ -102,10 +101,14 @@ public class ProfileController {
 		
 
 		// 1.파일 저장 경로 얻기
-//		File saveDir = new File("C:/Users/user/git/prj3_mvc/prj3_mvc/src/main/webapp/upload");
-		File saveDir = new File("E:/dev/workspace_spring/prj3_mvc3/src/main/webapp/upload");
+		//File saveDir = new File("C:/Users/user/git/prj3_mvc/prj3_mvc/src/main/webapp/upload");
+		//File saveDir = new File("E:/dev/workspace_spring/prj3_mvc3/src/main/webapp/upload");
+		File saveDir = new File("C:/Users/Kyum/git/prj3_sist");
+		
+		//파일최대크기,이름길이
 		int maxFileSize = 1024 * 1024 * 10; // 10MB
 		int maxFileNameLength = 30;
+		long fileSize = 0;
 		String originalFileName = "";
 
 		try {
@@ -116,13 +119,16 @@ public class ProfileController {
 			
 			if ( uploadFile != null) { //업로드 파일이 있으면
                 originalFileName = mr.getOriginalFileName("profile_upload_file");
-                long fileSize = uploadFile.length();
+                fileSize = uploadFile.length(); //파일 크기를 바이트 단위로 반환
 
                 
                 // 파일 확장자 검사
                 String fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
                 if (!fileExtension.equals("png") && !fileExtension.equals("jpg") && !fileExtension.equals("gif") && !fileExtension.equals("bmp")) {
-                    String errorMessage = "올바른 파일 형식이 아닙니다. jpg, gif, bmp 형식의 파일만 등록 가능합니다.";
+                	String errorMessage = "올바른 파일 형식이 아닙니다. jpg, gif, bmp, png 형식의 파일만 등록 가능합니다.";
+                    
+                    // 기존 페이지로 리디렉트하고 alert 메시지를 사용자에게 보여줌
+                    // 리다이렉트된 후에도 데이터가 유지되며, 한 번만 사용할 수 있음 (한 번 조회되면 데이터 삭제됨)
                     redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
                     return "redirect:/my_profile.do";
                 }
@@ -135,8 +141,6 @@ public class ProfileController {
                     redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
                     return "redirect:/my_profile.do"; //전 페이지로 이동
                 }//end if
-                
-                
             }//end if
 		
 		    
@@ -145,17 +149,15 @@ public class ProfileController {
 			pVO.setUser_id(mr.getParameter("user_id"));
 			pVO.setProfile_msg(mr.getParameter("profile_msg"));
 			pVO.setNick_name(mr.getParameter("nick_name"));
-			pVO.setProfile(originalFileName); // 파일 업로드를 안 한 경우 ""로 설정
+			pVO.setProfile(originalFileName); // 파일 업로드를 안했다면 ""
 
 			
-			// update 수행하자
-			if (pService.profileModifyService(pVO)) {// 성공
-
+			// update 수행
+			if (pService.profileModifyService(pVO)) {// 성공했다면 세션 정보 갱신하여 저장
 				lrDomain = pService.resetUserInfoService(pVO.getUser_id());
 				model.addAttribute("lrDomain", lrDomain);
 					
-				movePage = "redirect:/mypage.do"; //마이페이지로 이동
-
+				movePage = "redirect:/mypage.do";
 			} // end if
 			
 			

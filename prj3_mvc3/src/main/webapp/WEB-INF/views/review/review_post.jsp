@@ -258,8 +258,6 @@ height:100px;
 
 
 <script>
-
-
 //댓글 제출	
 function submitComment(button) {
     
@@ -295,17 +293,62 @@ function submitReply(button) {
 
 	  // 폼을 서버로 제출
 	  form.submit();
-	}//submitReply
+}//submitReply
 
 
+//댓글 버튼 눌렀을 때 대댓글창 열기	
+$('.bt_recomment').click(function() {
+	// 유저의 id 받기
+	var user_id = $("#hiddenId").val();
+		 
+	if(user_id ==""){
+		alert("로그인 후 이용 가능합니다.");
+		return;
+	}//end if
+	
+	
+	//cmt_unit: 댓글
+	//cmt_unit reply: 대댓글
+	
+	//cmt_write_unit: 입력창
+	//cmt_write : 부모댓글창
+	//cmt_write_re : 대댓글창
+	
+	//부모 댓글창 제외, 모든 대댓글 입력창은 먼저 숨기기
+	$('.cmt_write_unit:not(.cmt_write)').hide();
+		 
+	// 클릭된 버튼의 상위 요소인 cmt_unit 찾기
+	var cmtUnit = $(this).closest('.cmt_unit');
 
+	//해당 댓글의 cmt_write_unit 보이게
+	cmtUnit.find('.cmt_write_unit').show();
+
+	// form 요소의 height를 auto로 변경
+	cmtUnit.find('form.cmt_form').css('height', 'auto');
+
+	// cmt_textarea에 포커스
+	cmtUnit.find('.cmt_textarea').focus();
+
+});//click
+	
+		  
+//취소 버튼 클릭 시 댓글 입력창 숨기기
+ $('.bt_close').click(function() {
+	 $(this).closest('.cmt_write_unit').hide();
+ });		  
+ 
+ 
 //부모 댓글 삭제
 function confirmAndDel(commentId) {
 	  if (confirm("댓글을 삭제하시겠습니까?")) {
-	    // 해당 댓글 unit을 식별하여 대댓글 unit을 확인합니다.
-	    const commentUnit = $("#comment_"+commentId);
-	    const replyUnit = commentUnit.next(".cmt_unit.reply").first();
+		  
+	    // 해당 댓글 unit을 식별하여 대댓글 unit을 확인
+	    var commentUnit = $("#comment_"+commentId);
+	    
+	    //commentUnit의 다음에 있는 형제 요소들 중 클래스가 cmt_unit이면서 reply인 요소들 중 첫번째를 선택
+	    var replyUnit = commentUnit.next(".cmt_unit.reply").first();
 
+	    
 	    var com_num = commentId;
 	    var has_replies = false;
 
@@ -329,12 +372,12 @@ function confirmAndDel(commentId) {
 	        } else {
 	        
 	          //화면 업데이트
-	          if(has_replies){ //대댓이 있을 때
-	        	  const contentElement = commentUnit.find(".rhymix_content");
-	        	  contentElement.html('<span style="color: #777;">삭제된 댓글입니다.</span>');
+	          if(has_replies){ //대댓이 있는 경우
+	        	  var content = commentUnit.find(".rhymix_content");
+	        	  content.html('<span style="color: #777;">삭제된 댓글입니다.</span>');
 	        	  
-	          }else{
-	        	  commentUnit.remove(); // 코멘트 유닛 삭제
+	          }else{ //단독 댓글인 경우
+	        	  commentUnit.remove(); // 코멘트 유닛 화면에서 삭제
 	          }//end else
 	        
 	        }//end else
@@ -352,26 +395,23 @@ function confirmAndDel(commentId) {
 
 //대댓글 삭제(업뎃)	
 function deleteReply(event, replyNum){
-		
 
 	  if (confirm('댓글을 삭제하시겠습니까?')) {
 		        
-		  
 	    $.ajax({
 	      url: 'delete_reply.do',
 	      data: { reply_num: replyNum },
 	      dataType: 'json',
 	      success: function(response) {
-	        // 응답을 받았을 때의 동작 수행
 	       
 	        if (!response.resultFlag) {
 	          alert("댓글 삭제에 실패했습니다.");
 	          return;
 	        } else {
-	        	 //화면 업데이트
-	        	 const replyUnit = $("#reply_" + replyNum);
-		        const contentElement = replyUnit.find(".rhymix_content");
-		        contentElement.html('<span style="color: #777;">삭제된 댓글입니다.</span>');	  
+	        	//화면 업데이트
+	        	var replyUnit = $("#reply_" + replyNum);
+		        var content = replyUnit.find(".rhymix_content");
+		        content.html('<span style="color: #777;">삭제된 댓글입니다.</span>');	  
 	        	
 	        }//end else
 	        	
@@ -380,23 +420,10 @@ function deleteReply(event, replyNum){
 	        // 에러 처리
 	      }//end error
 	    });
-	    
-	    
 	  }//end if	
-		
-		
 }//deleteReply	
 	
 	
-/* function openEditor(button) {
-		    var writeUnit = $(button).closest('.cmt_unit').find('.cmt_write_unit');
-		    var editor = writeUnit.find('.cmt_textarea');
-		    writeUnit.show();
-		    writeUnit.height('auto');
-		    editor.focus();
-		  }//openEditor	 */
-
-		  
 		  
 //추천인 리스트 업데이트
 function updateRecommendationList() {
@@ -451,36 +478,30 @@ function updateRecommendationList() {
 	            alert("문제");
 	        }
 	    });//ajax
-	
 }//updateRecommendationList
 
 
 
-
-
-
-
-$(function() {
-	
-	
-	
-	
-	var currentLikes = $("#cntLike").text();
-	
+$(function() { 
 	// 유저의 id 받기
 	var user_id = $("#hiddenId").val();
 	var rv_num = ${param.rv_num};
 
-	// 좋아요 버튼이 눌리면
+	
+	// 좋아요 버튼 클릭
 	$("#likeBtn").click(function() {
 
 		// 사용자가 로그인 상태인지 확인
 		if (user_id !== "") {
 
 			// 현재 버튼의 클래스를 확인
-			var liked = $(this).hasClass('submitted');
 			// 눌린 상태였다면 true, 안눌린 상태였다면 false 
+			var liked = $(this).hasClass('submitted');
+			
+			//현재 좋아요 개수 확인
+			var currentLikes = $("#cntLike").text();
 
+			
 			$.ajax({
 				// db의 좋아요 테이블에 insert 혹은 delete해주기
 				url: "/prj3_mvc3/likeClicked.do",
@@ -493,34 +514,26 @@ $(function() {
 				dataType: "json",
 				success: function(jsonObj) {
 
-					// db에서 할일
-
 					if (jsonObj.resultFlag) { // db 작업에 성공하면
-
-						if (liked) { // 눌린 상태였다면 해제하기
-
+						
+						if (liked) { // 눌린 상태였다면 css 해제하기 + 숫자 감소
 							$("#likeBtn").removeClass('submitted');
 							currentLikes--;
 							$("#cntLike").text(currentLikes);
-						} else { // 안 눌린 상태였다면 누르기
-
+						} else { // 안 눌린 상태였다면 css 추가하기 + 숫자 증가
 							$("#likeBtn").addClass('submitted');
 							currentLikes++;
 							$("#cntLike").text(currentLikes);
 						}//end else
-
-							
 							
 						//추천인 리스트 받아서 화면 업데이트	
 						updateRecommendationList();
-							
-					}//end if	
 					
+					}//end if	
 				},//end success
 				error: function(xhr) {
 					alert("문제");
 				}//end error
-
 			});//ajax
 
 		} else {
@@ -530,45 +543,6 @@ $(function() {
 });//click
 
 
-
-
-	
-	//댓글 버튼 눌렀을 때 대댓글창 열기	
-		 $('.bt_recomment').click(function() {
-			// 유저의 id 받기
-			var user_id = $("#hiddenId").val();
-			 
-			 if(user_id ==""){
-				alert("로그인 후 이용 가능합니다.");
-				 return;
-			 }//end if
-		
-			 
-			    $('.cmt_write_unit:not(.cmt_write)').hide();
-			 
-			    // 클릭된 버튼의 상위 요소인 cmt_unit을 찾습니다.
-			    var cmtUnit = $(this).closest('.cmt_unit');
-
-			    // cmt_write_unit 요소를 보이도록 설정합니다.
-			    cmtUnit.find('.cmt_write_unit').show();
-
-			    // form 요소의 height를 auto로 변경합니다.
-			    cmtUnit.find('form.cmt_form').css('height', 'auto');
-
-			    // cmt_textarea에 포커스를 설정합니다.
-			    cmtUnit.find('.cmt_textarea').focus();
-			  });//click
-		
-			  
-			  
-	//취소 버튼 클릭 시 댓글 입력창 숨기기
-		 $('.bt_close').click(function() {
-			    $(this).closest('.cmt_write_unit').hide();
-			});		  
-
-
-
-	
 });//ready
 
 
@@ -943,12 +917,8 @@ $(function() {
 								</c:when>
 							</c:choose>
 
-
 							</div><!-- //cmt_버블 -->
-							
-							
 						</article><!-- 전체 article ink_atc round20 has_list-->
-						
 					</section><!--ink_board guest_mode  -->
 				</div>
 			</div>

@@ -40,9 +40,7 @@ public class CommentController {
 		int rv_num = cVO.getRv_num();
 		
 		if(commService.addCommentService(cVO)) {
-			System.out.println("댓글 등록 성공");
 			resultPage="redirect:/review_post.do?rv_num="+rv_num;
-		
 		}//end if
 		
 		return resultPage;
@@ -64,20 +62,20 @@ public class CommentController {
 
 		
 		if(has_replies) { //대댓이 있다면
+			
+			//삭제하지 않고 내용을 null로 업뎃
 			if(commService.updateCommentService(com_num)) {
 				jsonObj.put("resultFlag", true);
 			}//end if
 			
 		}else { //대댓이 없다면
+			
+			//레코드 자체를 삭제
 			commService.removeCommentService(com_num);
 			jsonObj.put("resultFlag", true);
 		}//end else
 		
-
 		return jsonObj.toJSONString();
-		
-		//return "redirect: review_post.do"; //리뷰 글 페이지로
-
 	}//removeCommentProcess
 	
 
@@ -94,7 +92,6 @@ public class CommentController {
 
 		
 		if(commService.addReplyService(rpVO)) {
-			System.out.println("대댓글 등록 성공");
 			resultPage="redirect:/review_post.do?rv_num="+rv_num;
 		}//end if
 		

@@ -97,115 +97,104 @@ window.onload = function() {
 
 
 $(function(){
-
-	//중복확인했니?
-	var isDupChecked = false;
+	
+	//중복 확인된 닉네임
 	var checkedNick = "";
 	
-	//닉네임 중복버튼
-	$("#dupBtn").click(function(){
-		
-		var nickname = ($("#nick_name").val()).trim();
-		
-		
-		if(nickname!=""){ //닉네임이 입력된 상태라면
-		
-			//기존의 닉네임과 일치할 때
-			if(($("#old_nick_name").val()).trim()==nickname){
-				checkedNick=nickname;
+	
+		//닉네임 중복버튼
+		$("#dupBtn").click(function() {
+
+			var nickname = ($("#nick_name").val()).trim();
+
+			if (nickname != "") { //닉네임이 입력된 상태라면
+
+				//기존의 닉네임과 일치할 때 (변경x)
+				if (($("#old_nick_name").val()).trim() == nickname) {
+					//중복 확인된 닉네임에 기존 닉네임 저장
+					checkedNick = nickname;
 					return;
-			}//end if	
-			
-			
-			
-		$.ajax({
-			
-			url:"nick_dup.do",
-			data:{nick_name : nickname},
-			method:"post",
-			dataType:"json",
-			success : function(response) {
-				
-			 	if(response.available){
-					alert("사용 가능합니다.");
-					//$("#nick_name").val(nickname);
-					checkedNick = $("#nick_name").val();
-					
-				}else{
-					alert("이미 사용중 다시 입력해주세요.");
-					$("#nick_name").val("");
-					$("#nick_name").focus();
-					return;
-				}//end else
-				 
-				
-			},
-			error : function(xhr){
-					alert("서버 오류가 발생했습니다.");
-			}//end error
-			
-		});//ajax
+				}//end if	
+
+				$.ajax({
+
+					url : "nick_dup.do",
+					data : {
+						nick_name : nickname
+					},
+					method : "post",
+					dataType : "json",
+					success : function(response) {
+
+						if (response.available) {
+							alert("사용 가능합니다.");
+							
+							//중복확인된 닉네임에 저장
+							checkedNick = $("#nick_name").val();
+
+						} else {
+							alert("이미 사용 중인 닉네임입니다. 다시 입력해주세요.");
+							$("#nick_name").val("");
+							$("#nick_name").focus();
+							return;
+						}//end else
+
+					},
+					error : function(xhr) {
+						alert("서버 오류가 발생했습니다.");
+					}//end error
+
+				});//ajax
+
+			} else {
+				alert("닉네임을 입력해주세요.");
+				return;
+			}//end else
+		});//click
+
 		
 		
-		}else{
-			alert("닉네임을 입력해주세요.");
-			return;
-		}//end else
 		
-	});//click
-	
-	
-	
-	$("#setProfileBtn").click(function() {
+	//프로필 등록 버튼
+		$("#setProfileBtn").click(function() {
 
 			var profile_msg = ($("#profile_msg").val()).trim();
 			var nickname = ($("#nick_name").val()).trim();
 			var oldnick = ($("#old_nick_name").val()).trim();
 
-			//alert("입력한 값:"+nickname + "/ 기존 닉넴:" + oldnick);
-			
-			if(nickname==""){
+			if (nickname == "") {
 				alert("닉네임은 필수 입력입니다.");
 				return;
 			}//end if
-			
-			
-			if(profile_msg==""){
+
+			if (profile_msg == "") {
 				alert("자기소개는 필수 입력입니다.");
 				return;
 			}//end if
+
 			
-			
-		
-			if (oldnick !== nickname) { //입력값과 기존값이 일치하지 않은채로 등록버튼 누름
-			
-				//alert("중복확인한값:"+checkedNick+" / 최종 제출값:"+nickname);
-			
-				if (checkedNick!=nickname) { //중복확인
+			//닉네임 변경된 경우
+			if (oldnick != nickname) { 
+				//중복 확인했는지 먼저 확인
+				if (checkedNick != nickname) { //중복확인된 닉네임과 최종 입력값 비교
 					alert("닉네임 중복 확인을 먼저 수행해주세요");
 					return;
-				}//end if */
-
+				}//end if
 			}//end if
-			//alert("일치한 상태로 냅다 등록버튼 혹은 중복확인까지 완료");
 			
+
 			$("#frm").submit();
 
 		});//click
 
 		
-		
-	//영화 검색	
-	$("#searchBtn").click(function(){
-		
-		
-		$("#movieSearchFrm").submit();		
-		
-	});//click	
-		
-		
-		
-		
+		//영화 검색	
+		$("#searchBtn").click(function() {
+
+			$("#movieSearchFrm").submit();
+
+		});//click	
+
 	});//ready
 </script>
 

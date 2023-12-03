@@ -28,7 +28,7 @@ public class ProfileService {
 
 	
 	/**
-	 * 닉네임으로 검색
+	 * 닉네임 중복확인
 	 * @param nickName
 	 * @return
 	 */
@@ -41,7 +41,6 @@ public class ProfileService {
 		jsonObj.put("available", available);
 		
 		available = jDAO.selectDupNick(nick_name)==null;
-		System.out.println(nick_name+"---"+available);
 		
 		if(available) {
 			jsonObj.put("available", available);
@@ -53,9 +52,8 @@ public class ProfileService {
 
 	
 	
-	
 	/**
-	 * 프로필, 닉네임 수정
+	 * 프로필, 닉네임 수정 (암호화x)
 	 * @param pVO
 	 * @return
 	 */
@@ -67,58 +65,48 @@ public class ProfileService {
 	}//updateProfile
 	
 	
-	
-	
 	/**
-	 * 자기소개만 세팅 (나머지는 세션에서)
+	 * 유저 정보 셀렉 후 이름 복호화하여 화면에 보이기
 	 * @param user_id
 	 * @return
-	 * @throws UnsupportedEncodingException 
-	 * @throws GeneralSecurityException 
-	 * @throws NoSuchAlgorithmException 
+	 * @throws UnsupportedEncodingException
+	 * @throws NoSuchAlgorithmException
+	 * @throws GeneralSecurityException
 	 */
-/*	public String profileMsgSetService(String user_id) {
-		
-		String profileMsg = "";
-		profileMsg = pDAO.selectProfileMsg(user_id);
-			
-		return profileMsg;
-		
-		
-	}//profileSetService
-*/	
-	
-	public MyProfileDomain profileSetService(String user_id) throws UnsupportedEncodingException, NoSuchAlgorithmException, GeneralSecurityException {
-		
+	public MyProfileDomain profileSetService(String user_id)
+			throws UnsupportedEncodingException, NoSuchAlgorithmException, GeneralSecurityException {
+
 		MyProfileDomain profile = null;
 		profile = pDAO.selectProfile(user_id);
-		DataDecrypt dd=new DataDecrypt("FsRt4SfY4US0IWtK4JPJsw==");
+		DataDecrypt dd = new DataDecrypt("FsRt4SfY4US0IWtK4JPJsw==");
 		profile.setName(dd.decryption(profile.getName()));
 		return profile;
-		
-	}//profileService
-	
-	
 
-	// 프로필 변경 후 다시 셀렉
-			public LoginResultDomain resetUserInfoService(String user_id) throws UnsupportedEncodingException, GeneralSecurityException {
-				
-				LoginResultDomain lrDomain = null;
-				
-				lrDomain = pDAO.reselectUserInfo(user_id);
+	}// profileService
 
-				if(lrDomain!=null) {
-				
-				DataDecrypt dd=new DataDecrypt("FsRt4SfY4US0IWtK4JPJsw==");
-				lrDomain.setName(dd.decryption(lrDomain.getName()));
-				
-				}
-				
-				return lrDomain;
-				
-			}//resetUserInfoService
 	
-	
+	/**
+	 * 프로필 변경 후 유저 정보 다시 셀렉하여 세션에 갱신
+	 * @param user_id
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws GeneralSecurityException
+	 */
+	public LoginResultDomain resetUserInfoService(String user_id)
+			throws UnsupportedEncodingException, GeneralSecurityException {
+
+		LoginResultDomain lrDomain = null;
+
+		lrDomain = pDAO.reselectUserInfo(user_id);
+
+		if (lrDomain != null) {
+			DataDecrypt dd = new DataDecrypt("FsRt4SfY4US0IWtK4JPJsw==");
+			//이름은 복호화해야함
+			lrDomain.setName(dd.decryption(lrDomain.getName()));
+		}
+
+		return lrDomain;
+	}// resetUserInfoService
 	
 	
 }//class

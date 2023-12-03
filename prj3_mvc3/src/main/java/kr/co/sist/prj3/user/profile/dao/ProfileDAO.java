@@ -14,7 +14,7 @@ public class ProfileDAO {
 
 	
 	/**
-	 * 닉네임으로 검색 
+	 * 닉네임 중복 검사
 	 * @param nickName
 	 * @return
 	 */
@@ -73,27 +73,12 @@ public class ProfileDAO {
 	
 	
 	
-/*	public String selectProfileMsg(String user_id) {
-		
-		String profileMsg = "";
-		
-		//1.MyBatis 핸들러 얻기
-		SqlSession ss = MyBatisHandler.getInstance().getMyBatisHandler(false);
-		
-		//2. Handler를 사용하기
-		profileMsg = ss.selectOne("selectProfileMsg", user_id);		
-		
-				
-		//4. 연결 끊기
-		if(ss!=null) {ss.close();}//end if
-				
-		return profileMsg;
-		
-		
-	}//selectProfileMsg
-*/	
 	
-	
+	/**
+	 * 프로필 조회
+	 * @param user_id
+	 * @return
+	 */
 	public MyProfileDomain selectProfile(String user_id) {
 		
 		MyProfileDomain profile = null;
@@ -115,7 +100,12 @@ public class ProfileDAO {
 	
 	
 	
-	//lrDomain 세팅
+	
+		/**
+		 * lrDomain 세팅
+		 * @param user_id
+		 * @return
+		 */
 		public LoginResultDomain reselectUserInfo(String user_id) {
 			
 			LoginResultDomain lrDomain = null;

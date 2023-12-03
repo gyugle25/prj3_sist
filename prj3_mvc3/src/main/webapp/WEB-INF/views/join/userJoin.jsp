@@ -88,277 +88,277 @@ input[type="date" i] {
 
 <script type="text/javascript">
 
+	//휴대폰번호 형식 유효성 검증 
+	function telValidation(input) {
+		// 입력에서 숫자가 아닌 모든 문자 제거
+		var sanitized = input.value.replace(/[^0-9]/g, '');
 
-//휴대폰번호 형식 유효성 검증 
-function telValidation(input) {
-// 입력에서 숫자가 아닌 모든 문자 제거
-  var sanitized = input.value.replace(/[^0-9]/g, '');
-  
-   // 입력이 6자보다 더 이상인지 점검하십시오.
-  if (sanitized.length > 6) {
-    // 적절한 위치에 대시 삽입
-    sanitized = sanitized.slice(0, 3) + '-' + sanitized.slice(3, 7) + '-' + sanitized.slice(7,11);
-  }
-  
-  // 형식 지정된 날짜로 입력 값 업데이트
-  input.value = sanitized;
-}//telValidation
+		// 입력이 6자보다 더 이상인지 점검
+		if (sanitized.length > 6) {
+			// 적절한 위치에 대시 삽입
+			sanitized = sanitized.slice(0, 3) + '-' + sanitized.slice(3, 7)
+					+ '-' + sanitized.slice(7, 11);
+		}
 
+		// 형식 지정된 날짜로 입력 값 업데이트
+		input.value = sanitized;
+	}//telValidation
 
-
-
-function toggleDiv() {
-	  var div1 = document.getElementById("DevPolicyService");
-	  
-	  if (div1.style.display === "none") {
-	    div1.style.display = "block";
-	  } else {
-	    div1.style.display = "none";
-	  }// end else
-}
-
-
-function toggleDiv2() {
-	var div2 = document.getElementById("DevPolicyPrivacy");
-	  
-	if (div2.style.display === "none") {
-	  div2.style.display = "block";
-	} else {
-	  div2.style.display = "none";
-	}// end else
-}
-
-
-
-
-//정규식 패턴들
-const regexPatterns = {
-  id: /^[a-zA-Z0-9_-]{3,16}$/,
-  nickname: /^[a-zA-Z0-9_\uac00-\ud7af]{1,10}$/,
-  email: /^\S+@\S+\.\S+$/,
-  password: /^[a-zA-Z0-9]{4,16}$/
-};
-
-
-
-// 유효성 검사 함수
-function validateInput(input, regex, errorMessage) {
-  var value = input.val().trim();
-  var validationMsg = input.next(".error-message");
-
-  if (!regex.test(value)) {
-    validationMsg.text(errorMessage).show();
-    return false;
-  }
-
-  validationMsg.hide();
-  return true;
-}//validateInput
-
-
-
-//비번 확인 함수
- function checkPassword() {
-    var password = $("#pass").val().trim();
-    var confirmPass = $("#passCheck").val().trim();
-    var passCheckValidation = $("#error_passCheck");
-
-
-    if (password !== confirmPass) {
-      passCheckValidation.text("입력한 비밀번호와 불일치합니다.").show();
-      return false; // 일치하지 않으면 false 반환
-    }
-
-    passCheckValidation.hide();
-    return true; // 일치하면 true 반환
-  }//checkPassword
-
-  
-  
-
-//ready 시작
-$(function() {
 	
-	 // 유효성 확인 결과 저장용
-	  let isValidId = false;
-	  let isValidNickname = false;
-	  let isValidEmail = false;
-	  let isValidPassword =false;
-	  let isValidPasswordCheck =false;
+	//내용 보기 
+	function toggleDiv() {
+		var div1 = document.getElementById("DevPolicyService");
 
-	  //중복 확인 결과 저장용
-	let isIdAvailable = false;
-	let isNicknameAvailable = false;
-	let isEmailAvailable = false;
+		//보이기/숨기기
+		if (div1.style.display === "none") {
+			div1.style.display = "block";
+		} else {
+			div1.style.display = "none";
+		}// end else
+	}
+
+	function toggleDiv2() {
+		var div2 = document.getElementById("DevPolicyPrivacy");
+
+		if (div2.style.display === "none") {
+			div2.style.display = "block";
+		} else {
+			div2.style.display = "none";
+		}// end else
+	}
+
+	
+	//정규식 패턴 정의 (특정 형식을 가진 문자열 검증)
+	const regexPatterns = {
+		id : /^[a-zA-Z0-9_-]{3,16}$/,
+		nickname : /^[a-zA-Z0-9_\uac00-\ud7af]{1,10}$/,
+		email : /^\S+@\S+\.\S+$/,
+		password : /^[a-zA-Z0-9]{4,16}$/
+	};
 	
 	
-	//주소검색 버튼
-	$("#kakao").click(function() {
-		findZip();
-	});// click
+	// 정규식 패턴 일치 함수 - 입력값, 정규식, 에러메시지
+	function validateInput(input, regex, errorMessage) {
+		var value = input.val().trim();
+		var validationMsg = input.next(".error-message"); // 다음 형제 요소 중 class가 error-message인 요소를 선택
+
+		//유효 여부를 true/false로 반환 (isXxValid)
+		if (!regex.test(value)) { 
+			validationMsg.text(errorMessage).show(); //일치하지 않으면 메시지를 보여주고 false 반환
+			return false;
+		} else {
+			validationMsg.hide(); //일치하면 메시지를 숨기고 true 반환
+			return true;
+		}
+	}//validateInput
+
 	
+	//비번-비번확인 검사 함수
+	function checkPassword() {
+		var password = $("#pass").val().trim();
+		var confirmPass = $("#passCheck").val().trim();
+		var passCheckValidation = $("#error_passCheck"); //메시지 div 요소 선택
+
+		if (password !== confirmPass) {
+			passCheckValidation.text("입력한 비밀번호와 불일치합니다.").show();
+			return false; // 일치하지 않으면 false 반환
+		}else {
+		passCheckValidation.hide();
+		return true; // 일치하면 true 반환
+		}
+	}//checkPassword
+
 	
-	
-	//약관 모두 선택하기
-	$("#lb_chk_all").click(function() {
-		var isChecked = $(this).prop('checked');
-		$('input[name="terms"]').prop('checked', isChecked);
-	});//click
-	
-	
-	
-	// 각 필드에 대한 유효성 검사
-	//아이디
-	$("#user_id").blur(function() {
-		var userId = $(this).val();
+	//ready 시작
+	$(function() {
+
+		// 유효성 확인 결과 저장용 (isValidXxx)
+		let isValidId = false;
+		let isValidNickname = false;
+		let isValidEmail = false;
+		let isValidPassword = false;
+		let isValidPasswordCheck = false;
+
+		//중복 확인 결과 저장용 (isXxxAvailable)
+		let isIdAvailable = false;
+		let isNicknameAvailable = false;
+		let isEmailAvailable = false;
+
 		
-		if(userId!=""){ //값이 입력되어 있을 때
-			//유효성 검사
-			isValidId = validateInput($(this), regexPatterns.id, "아이디는 3~16자의 영문, 숫자, 특수문자(_,-)만 사용 가능합니다.");
-			
-	    //유효하지 않을 경우 종료
-	    if(!isValidId){
-	    	return;
-	    }//end if
-	    
-	    
-	    //db 중복값 확인
-	    $.ajax({
-			
-			url:"idDup.do",
-			data:{user_id : userId},
-			dataType:"json",
-			success : function(response) {
-				
-				isIdAvailable = response.available;
-				
-			 	if(!isIdAvailable){
-					alert("이미 사용 중인 아이디입니다. 다시 입력해주세요.");
-					$("#user_id").val("");
-					$("#user_id").focus();
-					return;
-			 	}//end if
-			},
-			error : function(xhr){
-					alert("서버 오류가 발생했습니다.");
-			}//end error
-			
-		});//ajax
-	    
-		}//end if
-	    
-	});//blur
+		//주소검색 버튼
+		$("#kakao").click(function() {
+			findZip();
+		});// click
 
-	
-	
-	//이메일
-	  $("#email").blur(function() {
-	    
-		  var email = $(this).val();
-		  	
-	    if(email!=""){ //값이 입력되었을 때
-	    	isValidEmail = validateInput($(this), regexPatterns.email, "유효한 이메일을 입력해주세요.");
-	    
-	    	if(!isValidEmail){
-	    		return;
-	    	}//end if
-	    	
-	    	
-	    //db 중복확인	
-		$.ajax({
-			
-			url:"emailDup.do",
-			data:{email : email},
-			method:"post",
-			dataType:"json",
-			success : function(response) {
-				
-				isEmailAvailable = response.available;
-				
-			 	if(!isEmailAvailable){
-					alert("이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.");
-					$("#email").val("");
-					$("#email").focus();
-					return;
-				}//end else
-				 
-				
-			},
-			error : function(xhr){
-					alert("서버 오류가 발생했습니다.");
-			}//end error
-			
-		});//ajax
+		//약관 모두 선택하기
+		$("#lb_chk_all").click(function() {
+			var isChecked = $(this).prop('checked');
+			//name 속성이 "terms"인 요소의 속성 설정
+			$('input[name="terms"]').prop('checked', isChecked);
+		});//click
 
-	    }//end if 
-	    
-	  });//blur
-	  
-	  
-	
-	  //닉네임 중복 확인
-	  $("#nick_name").blur(function() {
-	    
-		  var nickname = $(this).val();
-		  
-		  if(nickname!==""){
-		  isValidNickname = validateInput($(this), regexPatterns.nickname, "닉네임은 1~10자의 한글, 영문, 숫자, 밑줄(_)만 사용 가능합니다.");
-	    
-			 if(!isValidNickname ){
-				 return;
-			 }//end if
-	    
-			 
-	    //db 중복 확인
-		$.ajax({
-			
-			url:"nickDup.do",
-			data:{nick_name : nickname},
-			method:"post",
-			dataType:"json",
-			success : function(response) {
-				
+		
+		
+		// 각 필드에 대한 유효성 검사 시작
+		//아이디 (패턴 일치, 중복 여부)
+		$("#user_id").blur( //포커스가 빠져나갈 때
+				function() {
+					var userId = $(this).val();
 
-				isNicknameAvailable = response.available;
-				
-			 	if(!isNicknameAvailable){
-					alert("이미 사용 중인 닉네임입니다. 다시 입력해주세요.");
-					$("#nick_name").val("");
-					$("#nick_name").focus();
-					return;
-				}//end else
-				 
-				
-			},
-			error : function(xhr){
-					alert("서버 오류가 발생했습니다.");
-			}//end error
-			
-		});//ajax
-	    
-	   }//end if
-	    
-	  });//blur
-	  
+					if (userId != "") { //값이 입력되어 있을 때
+						//유효성 검사
+						isValidId = validateInput($(this), regexPatterns.id,
+								"아이디는 3~16자의 영문, 숫자, 특수문자(_,-)만 사용 가능합니다.");
 
-	  //비밀번호 유효성
-	  $("#pass").on("keyup", function() {
-		  isValidPassword = validateInput($(this), regexPatterns.password, "비밀번호는 4~10자의 영문과 숫자만 가능합니다.");
-		  checkPassword();
-	  });
-	  
-	  //비번확인
-	  $("#passCheck").on("keyup", function() {
-		  isValidPasswordCheck = checkPassword();
+						//유효하지 않을 경우 종료
+						if (!isValidId) {
+							return;
+						}//end if
+
+						//db 중복값 확인
+						$.ajax({
+
+							url : "idDup.do",
+							data : {
+								user_id : userId
+							},
+							dataType : "json",
+							success : function(response) {
+								
+								//중복 여부
+								isIdAvailable = response.available;
+
+								if (!isIdAvailable) {
+									alert("이미 사용 중인 아이디입니다. 다시 입력해주세요.");
+									$("#user_id").val("");
+									$("#user_id").focus();
+									return;
+								}//end if
+							},
+							error : function(xhr) {
+								alert("서버 오류가 발생했습니다.");
+							}//end error
+
+						});//ajax
+
+					}//end if
+
+				});//blur
+
+		//이메일(패턴 일치, 중복 여부)
+		$("#email").blur(
+				function() {
+
+					var email = $(this).val();
+
+					if (email != "") { //값이 입력되었을 때
+						isValidEmail = validateInput($(this),
+								regexPatterns.email, "유효한 이메일을 입력해주세요.");
+
+						if (!isValidEmail) {
+							return;
+						}//end if
+
+						//db 중복확인	
+						$.ajax({
+
+							url : "emailDup.do",
+							data : {
+								email : email
+							},
+							method : "post",
+							dataType : "json",
+							success : function(response) {
+
+								isEmailAvailable = response.available;
+
+								if (!isEmailAvailable) {
+									alert("이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.");
+									$("#email").val("");
+									$("#email").focus();
+									return;
+								}//end else
+
+							},
+							error : function(xhr) {
+								alert("서버 오류가 발생했습니다.");
+							}//end error
+
+						});//ajax
+
+					}//end if 
+
+				});//blur
+
+				
+		//닉네임 (패턴 일치, 중복 여부)
+		$("#nick_name").blur(
+				function() {
+
+					var nickname = $(this).val();
+
+					if (nickname !== "") {
+						isValidNickname = validateInput($(this),
+								regexPatterns.nickname,
+								"닉네임은 1~10자의 한글, 영문, 숫자, 밑줄(_)만 사용 가능합니다.");
+
+						if (!isValidNickname) {
+							return;
+						}//end if
+
+						//db 중복 확인
+						$.ajax({
+
+							url : "nickDup.do",
+							data : {
+								nick_name : nickname
+							},
+							method : "post",
+							dataType : "json",
+							success : function(response) {
+
+								isNicknameAvailable = response.available;
+
+								if (!isNicknameAvailable) {
+									alert("이미 사용 중인 닉네임입니다. 다시 입력해주세요.");
+									$("#nick_name").val("");
+									$("#nick_name").focus();
+									return;
+								}//end else
+
+							},
+							error : function(xhr) {
+								alert("서버 오류가 발생했습니다.");
+							}//end error
+
+						});//ajax
+
+					}//end if
+
+				});//blur
+
+				
+		//비번 유효성 (패턴 일치)
+		$("#pass").on("keyup", function() { //keyup 이벤트에 핸들러 등록
+					//비번의 유효성 검사
+					isValidPassword = validateInput($(this),regexPatterns.password,"비밀번호는 4~10자의 영문과 숫자만 가능합니다.");
+		
+					//비번 확인과 일치 검사 (비번과 비번확인의 값 선택,비교하여 메시지 설정)
+					checkPassword(); 
 		});
 
+				
+		//비번확인 유효성
+		$("#passCheck").on("keyup", function() {
+			isValidPasswordCheck = checkPassword();
+		});
 
-	  
+		
+		
 		//회원가입 버튼 클릭
 		$("#joinBtn").click(
 				function() {
 
-					
 					//필수 입력 확인
 					if ($("#user_id").val() == "") {
 						alert("아이디는 필수입력입니다.");
@@ -417,24 +417,24 @@ $(function() {
 						alert("주소는 필수입력입니다.");
 						return;
 					}//end if 
+
 					
-					
+					//체크 여부 확인
 					if ($('#lb_chk_age').is(':checked') == false
 							|| $('#lb_chk_service').is(':checked') == false
 							|| $('#lb_chk_privacy').is(':checked') == false) {
 						alert("필수동의가 체크되지 않았습니다.");
 						return;
 					}//end if
-					
-					
 
-					//유효성 검사 및 중복 검사 결과 확인
-   					 if (!isValidId || !isValidNickname || !isValidEmail || !isIdAvailable || !isNicknameAvailable || !isEmailAvailable || !isValidPassword || !isValidPasswordCheck) {
-   					    alert("필수 항목을 확인해주세요");
-   					    return; // 조건을 만족하지 않을 때 함수 종료
-   					  }
-   					 
 					
+					//유효하지 않은 값으로 가입하는 것을 막음
+					if (!isValidId || !isValidNickname || !isValidEmail
+							|| !isValidPassword || !isValidPasswordCheck) {
+						alert("필수 항목을 확인해주세요");
+						return; // 조건을 만족하지 않을 때 함수 종료
+					}
+
 					$("#joinFrm").submit();
 				});// click
 	});// ready
@@ -498,16 +498,16 @@ $(function() {
 								<div class="notice_msg" id="notice_msg_name"></div>
 							</div>
 						</div>
-						<div class="row mbr_name">
+						<div class="row mbr_id">
 							<div class="col_1">
 								<i class="icon required" aria-hidden="hidde">*</i>
 							</div>
-							<div class="col_2">
+							<div class="col_2"><!--id가 user_id인 요소의 다음 형제 요소 중 class가 error-message인 요소-->
 								<input type="text" id="user_id" name="user_id" placeholder="아이디 (3~16자의 영문, 숫자, 특수문자(_,-)만 사용가능)" maxlength="12">
 								<div class="error-message" id="error_id"></div>
 							</div>
 						</div>
-						<div class="row mbr_name">
+						<div class="row mbr_id">
 							<div class="col_1">
 								<i class="icon required" aria-hidden="hidde">*</i>
 							</div>
